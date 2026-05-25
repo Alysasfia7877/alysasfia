@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus in Malaysian Food Security: Post-Harvest Loss</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+        
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-6 md:p-8">
+            <span class="bg-emerald-500/30 text-emerald-100 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                SFM: Food Security Mathematics Application
+            </span>
+            <h1 class="text-2xl md:text-4xl font-extrabold mt-2">Applying Derivatives to Food Supply Chains</h1>
+            <p class="text-emerald-100 mt-2 text-sm md:text-base max-w-3xl">
+                Modeling the post-harvest biomass degradation rate of local Berangan Bananas (<em>Musa acuminata</em>) under tropical ambient conditions ($28^\circ\text{C}$).
+            </p>
+        </div>
+
+        <div class="p-6 md:p-8 space-y-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 mb-2">The Bioscience Problem</h2>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            In Malaysia, high ambient temperatures accelerate the respiration and physiological decay of fresh produce. For vulnerable staple fruits like the Berangan banana, this leads to rapid post-harvest biomass and quality loss, directly affecting national food security and market pricing. 
+                        </p>
+                        <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                            By tracking the <strong>first derivative $f'(x)$</strong>, food logistics managers can determine the exact day the spoilage rate peaks. This empowers supply chains to precisely time cold-room transfers, processing into secondary goods, or immediate retail distribution before catastrophic loss occurs.
+                        </p>
+                    </div>
+                    <div class="mt-4 text-xs text-slate-400 italic">
+                        Baseline data parameters adapted from: MARDI (Malaysian Agricultural Research and Development Institute) Postharvest Handling Manuals.
+                    </div>
+                </div>
+
+                <div class="bg-emerald-50/50 p-5 rounded-xl border border-emerald-100 flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-emerald-900 mb-3">Mathematical Modeling</h2>
+                        
+                        <div class="mb-4">
+                            <span class="block text-xs font-semibold uppercase text-emerald-700">Biomass Quality Status $f(x)$</span>
+                            <div class="bg-white p-2 rounded border border-emerald-200 font-mono text-sm overflow-x-auto my-1">
+                                f(x) = 100 / (1 + e^(0.7 * (x - 5)))
+                            </div>
+                            <span class="text-xs text-slate-500 block">Where $x$ = Days post-harvest, $f(x)$ = Percentage (%) of pristine marketable quality.</span>
+                        </div>
+                        
+                        <div>
+                            <span class="block text-xs font-semibold uppercase text-emerald-700">Instantaneous Spoilage Velocity $f'(x)$</span>
+                            <div class="bg-white p-2 rounded border border-emerald-200 font-mono text-sm overflow-x-auto my-1">
+                                f'(x) = -70 * e^(0.7 * (x - 5)) / (1 + e^(0.7 * (x - 5)))^2
+                            </div>
+                            <span class="text-xs text-slate-500 block">Calculates the exact rate of quality degradation (% loss per day) at day $x$.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-amber-600" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-amber-800">
+                          <strong>Interactive Inspection:</strong> Click anywhere on the line graph below to evaluate the derivative at that exact moment in the storage timeline.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative bg-white p-4 rounded-xl border border-slate-200 shadow-inner h-[350px] md:h-[450px]">
+                <canvas id="decayChart"></canvas>
+            </div>
+
+            <div id="outputPanel" class="bg-slate-900 text-white p-6 rounded-xl shadow-md transition-all duration-300 transform scale-100 opacity-100 hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-700 pb-4 mb-4">
+                    <div>
+                        <h3 class="text-emerald-400 font-bold text-lg uppercase tracking-wide">Calculus Inspection Engine</h3>
+                        <p class="text-slate-400 text-xs">Instantly evaluating the derivative tangent line parameters</p>
+                    </div>
+                    <div class="mt-2 md:mt-0 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+                        <span class="text-slate-400 text-sm">Inspected Timeline:</span>
+                        <span id="displayDay" class="font-bold text-white text-lg ml-1">Day 0.0</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-xs text-slate-400 block uppercase tracking-wider">Remaining Marketable Quality [$f(x)$]</span>
+                            <div class="text-3xl font-extrabold text-white" id="valFx">100%</div>
+                        </div>
+                        <div>
+                            <span class="text-xs text-emerald-400 block uppercase tracking-wider">Instantaneous Decay Rate [$f'(x)$]</span>
+                            <div class="text-3xl font-extrabold text-rose-400" id="valFprimeX">-0.00% / day</div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex flex-col justify-center">
+                        <span class="text-xs text-amber-400 font-bold uppercase tracking-wider mb-2">📋 Layman Breakdown</span>
+                        <p id="laymanExplanation" class="text-slate-200 text-sm leading-relaxed">
+                            Click a coordinate along the timeline to trigger the mathematical breakdown.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('decayChart').getContext('2d');
+
+        // 1. Math Model Implementations
+        function f(x) {
+            return 100 / (1 + Math.exp(0.7 * (x - 5)));
+        }
+
+        function fPrime(x) {
+            const numerator = -70 * Math.exp(0.7 * (x - 5));
+            const denominator = Math.pow(1 + Math.exp(0.7 * (x - 5)), 2);
+            return numerator / denominator;
+        }
+
+        // 2. Generate smooth dataset values (0 to 10 days, in increments of 0.1)
+        const labels = [];
+        const dataPoints = [];
+        for (let x = 0; x <= 10; x = parseFloat((x + 0.1).toFixed(1))) {
+            labels.push(x);
+            dataPoints.push(f(x));
+        }
+
+        // 3. Custom Chart.js Plugin to draw the visual calculus inspector (vertical tracking line)
+        const lineTrackerPlugin = {
+            id: 'lineTrackerPlugin',
+            afterDraw: (chart) => {
+                if (chart.config.options.plugins.activeInspectorX !== undefined) {
+                    const xVal = chart.config.options.plugins.activeInspectorX;
+                    const xAxis = chart.scales.x;
+                    const yAxis = chart.scales.y;
+                    const xPixel = xAxis.getPixelForValue(xVal);
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(xPixel, yAxis.top);
+                    ctx.lineTo(xPixel, yAxis.bottom);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#f59e0b'; // Amber-500 tracking indicator
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+        Chart.register(lineTrackerPlugin);
+
+        // 4. Initialize Interactive Chart.js Rendering Instance
+        const decayChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Marketable Quality Percentage (%)',
+                    data: dataPoints,
+                    borderColor: '#059669', // Emerald-600
+                    backgroundColor: 'rgba(5, 150, 105, 0.04)',
+                    borderWidth: 3,
+                    pointRadius: 0, // Keeps the visual curve entirely clean
+                    hoverRadius: 6,
+                    fill: true,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1200,
+                    easing: 'easeOutCubic'
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Time in Storage (Days Post-Harvest)', font: { weight: 'bold', size: 13 } },
+                        grid: { color: '#f1f5f9' }
+                    },
+                    y: {
+                        min: 0,
+                        max: 100,
+                        title: { display: true, text: 'Remaining Pristine Biomass (%)', font: { weight: 'bold', size: 13 } },
+                        grid: { color: '#f1f5f9' }
+                    }
+                },
+                plugins: {
+                    legend: { display: true },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` Quality Level: ${context.parsed.y.toFixed(1)}%`;
+                            }
+                        }
+                    }
+                },
+                // Intercept clicks anywhere inside the data viewport boundaries
+                onClick: (event, elements, chart) => {
+                    const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
+                    const rawX = chart.scales.x.getValueForPixel(canvasPosition.x);
+                    
+                    // Clamp domain values securely within [0, 10] days range
+                    let calculatedDay = Math.min(Math.max(rawX * 0.1, 0), 10);
+                    calculatedDay = Math.round(calculatedDay * 10) / 10; // Round smoothly to nearest decimal point
+
+                    const currentQuality = f(calculatedDay);
+                    const currentRate = fPrime(calculatedDay);
+
+                    // Update tracking line parameter without executing entry animations anew
+                    chart.config.options.plugins.activeInspectorX = calculatedDay;
+                    chart.update('none');
+
+                    processUiReadout(calculatedDay, currentQuality, currentRate);
+                }
+            }
+        });
+
+        // 5. Dynamic Layman Translation and UI Output Engine
+        function processUiReadout(day, quality, rate) {
+            const panel = document.getElementById('outputPanel');
+            panel.classList.remove('hidden');
+
+            document.getElementById('displayDay').innerText = `Day ${day.toFixed(1)}`;
+            document.getElementById('valFx').innerText = `${quality.toFixed(1)}%`;
+            document.getElementById('valFprimeX').innerText = `${rate.toFixed(2)}% per day`;
+
+            let textExplanation = "";
+            const magnitude = Math.abs(rate);
+
+            // Conditional tracking logic checking state properties of the mathematical derivative curve
+            if (day === 5.0) {
+                textExplanation = `🚨 <strong>Critical Inflection Point reached!</strong> At exactly Day 5, the decay velocity reaches its absolute maximum peak speed, hemorrhaging <strong>${magnitude.toFixed(1)}%</strong> of baseline crop quality per day. Items must be extracted and processed immediately before turning completely unmarketable.`;
+            } else if (magnitude < 1.5) {
+                if (day < 5.0) {
+                    textExplanation = `🟢 <strong>Lag Phase (Highly Stable):</strong> Degradation speed is extremely minimal (-${magnitude.toFixed(2)}% quality/day). Respiration rates are controlled. This represents the ultimate window for shipping long distances to retailers or cross-state distribution nodes.`;
+                } else {
+                    textExplanation = `🟤 <strong>Terminal Phase (Total Degradation):</strong> The drop speed has flattened (-${magnitude.toFixed(2)}% quality/day) only because the biomass is already almost entirely degraded. The stock is no longer fit for grocery shelves.`;
+                }
+            } else if (rate < 0 && day < 5.0) {
+                textExplanation = `🟡 <strong>Acceleration Phase:</strong> The decay speed is building momentum, slipping at a rate of <strong>-${magnitude.toFixed(2)}%</strong> quality per day. Microbial activity and natural internal ripening systems are active. Immediate ambient cooling procedures are advised.`;
+            } else {
+                textExplanation = ` textExplanation = 🟠 <strong>Deceleration Phase:</strong> Although degradation continues to decrease quality by <strong>-${magnitude.toFixed(2)}%</strong> per day, the actual velocity is decreasing because the initial cellular tissues have already collapsed. Action must be taken instantly to convert remaining stock into value-added products like banana puree or organic compost.`;
+            }
+
+            document.getElementById('laymanExplanation').innerHTML = textExplanation;
+        }
+    </script>
+</body>
+</html>
